@@ -8,7 +8,13 @@
     $vendas = [];
     $logs = [];
 
+    function clearScreen() {
+        system('cls');
+    }    
+
     function login() {
+        clearScreen();
+
         global $usuario, $usuarioLogado;
 
         $login = readline("Digite seu nome de usuário: ");
@@ -26,6 +32,8 @@
     }
 
     function registrar() {
+        clearScreen();
+
         global $usuario;
 
         $login = readline("Digite seu novo nome de usuário: ");
@@ -43,6 +51,8 @@
     }
 
     function fazerVendas() {
+        clearScreen();
+
         global $vendas;
 
         $nomeProduto = readline("Digite o nome do produto: ");
@@ -115,6 +125,7 @@
                     echo "Opção inválida.\n";
             }
         }
+
     }
 
     while (true) {

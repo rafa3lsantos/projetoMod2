@@ -1,30 +1,28 @@
 <?php
-    //--- FUNÇÕES --- 
-    // Login
-    // Registrar
-    // Fazer Vendas
-    // Ver o Log
-    // Menu Inicial
-    // Menu Principal
 
+    $usuarioLogado = null;
     $usuario = [
         'adm' => '12345',
         'dinao' => 'bagua'
     ];
     $vendas = [];
     $logs = [];
-    
+
     function login() {
-        global $usuario;
-    
+        global $usuario, $usuarioLogado;
+
         $login = readline("Digite seu nome de usuário: ");
         $senha = readline("Digite sua senha: ");
-    
+
         if (isset($usuario[$login]) && $usuario[$login] === $senha) {
-            echo "Logado\n";
+            $usuarioLogado = $login;
+            echo "Bem-vindo $usuarioLogado\n";
         } else {
-            echo "Nao existe\n";
+            echo "Usuário ou senha inválidos\n";
         }
+
+        $data = date('d/m/Y H:i:s');
+        verificarLog("Usuário $login logou as $data");
     }
 
     function registrar() {
@@ -34,14 +32,14 @@
         $senha = readline("Digite sua nova senha: ");
 
         if (isset($usuario[$login])) {
-            echo "Usuário já existe.\n";
+            echo "Usuário já existe\n";
             return;
         }
 
         $usuario[$login] = $senha;
-        echo "Usuário registrado com sucesso!";
+        echo "Usuário registrado com sucesso!\n";
         $data = date('d/m/Y H:i:s');
-        addLog("Usuario $login registrado as $data");
+        verificarLog("Usuário $login registrado às $data");
     }
 
     function fazerVendas() {
@@ -51,36 +49,78 @@
         $valorProduto = readline("Digite o valor do produto: ");
 
         $vendas[$nomeProduto] = $valorProduto;
-        addLog("Produto vendido");
+
+        $data = date('d/m/Y H:i:s');
+        verificarLog("Produto $nomeProduto vendido por R$$valorProduto as $data");
     }
 
-    function menuInicial($usuario) {
-        echo "Bem-vindo ao sistema de gerenciamento de caixa\n";
-        echo "1. Login\n";
-        echo "2. Cadastrar novo usuário\n";
-        
-        $option = readline("Escolha uma opção: ");
-        print_r($usuario);
-
-        switch($option) {
-            case 1:
-                login($usuario);
-                break;
-            case 2:
-                registrar();
-                break;
-        }
-    }
-
-    function addLog($log) {
+    function verificarLog($log) {
         global $logs;
 
         $logs[] = $log;
     }
-    while (true){
-    menuInicial($usuario);
-}
 
+    function menuInicial() {
+        global $usuarioLogado;
 
+        echo "Bem-vindo ao sistema de gerenciamento de caixa\n";
+        echo "1 - Login\n";
+        echo "2 - Cadastrar novo usuário\n";
 
-    // $opcaoEntrada = readline("Escolha sua opção:\n 1 - Registar\n 2 - Login"); 
+        $opcaoInicial = readline("Escolha uma opção: ");
+
+        switch($opcaoInicial) {
+            case 1:
+                login();
+                if ($usuarioLogado !== null) {
+                    return; 
+                }
+                break;
+            case 2:
+                registrar();
+                break;
+            default:
+                echo "Opção inválida.\n";
+        }
+    }
+
+    function menuPrincipal() {
+        global $vendas, $usuarioLogado, $logs;
+
+        while (true) {
+            echo "Bem-vindo ao sistema de gerenciamento de caixa\n";
+            echo "Usuário: $usuarioLogado\n";
+            echo "1 - Vender\n";
+            echo "2 - Cadastrar novo usuário\n";
+            echo "3 - Verificar Log\n";
+            echo "4 - Deslogar\n";
+
+            $opcaoPrincipal = readline("Escolha uma opção: ");
+
+            switch($opcaoPrincipal) {
+                case 1:
+                    fazerVendas();
+                    break;
+                case 2:
+                    registrar();
+                    break;
+                case 3:
+                    print_r($logs); 
+                    break;
+                case 4:
+                    $usuarioLogado = null;
+                    echo "Você foi deslogado.\n";
+                    return;
+                default:
+                    echo "Opção inválida.\n";
+            }
+        }
+    }
+
+    while (true) {
+        if ($usuarioLogado == null) {
+            menuInicial();
+        } else {
+            menuPrincipal();
+        }
+    }
